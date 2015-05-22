@@ -127,49 +127,55 @@ void HelloWorld::onDraw()
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
+    auto size = Director::getInstance()->getWinSize();
+  
+	//新的数据结构
+	Vertex data[] = {
+		{{-1, -1}, {0, 1, 0, 1}},
+		{{1, -1}, {0, 1, 0, 1}},
+		{{-1, 1}, {0, 1, 0, 1}},
+		{{1, 1}, {0, 1, 0, 1}},
+	};
+
+	GLubyte indices[] = {
+		0, 1, 2,			// 第一个三角形索引
+		2, 3, 1,			// 第二个三角形索引
+	};
+
 	//创建和绑定vbo
 	glGenBuffers(1, &vertexVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
 
-    auto size = Director::getInstance()->getWinSize();
-    //指定将要绘制的三角形的三个顶点，分别位到屏幕左下角，右下角和正中间的顶端
-   // float vertercies[] = { 0,0,   //第一个点的坐标
-    //                        size.width, 0,   //第二个点的坐标
-    //                       size.width / 2, size.height};  //第三个点的坐标
-	float vertercies[] = { -1, -1,   
-                            1, -1,   
-							-1, 1,
-							-1, 1,
-							1, 1,
-							1, -1
-							};  
-    //指定每一个顶点的颜色，颜色值是RGBA格式的，取值范围是0-1
-    float color[] = { 0, 1,0, 1,    //第一个点的颜色，绿色
-                        0,1,0, 1,  //第二个点的颜色, 红色
-                         0,1,0, 1,  //第三个点的颜色， 蓝色
-						0,1,0, 1,
-						 0,1,0, 1,
-						 0,1,0, 1,
-						 };
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertercies), vertercies, GL_STATIC_DRAW);
 	//获取vertex attribute 'a_position'入口点
 	GLuint positionLocation = glGetAttribLocation(glProgram->getProgram(), "a_position");
 	//打开a_position入口点
 	glEnableVertexAttribArray(positionLocation);
 	//传递定点数据个a_position，注意最后一个参数是数组的便宜了
-	glVertexAttribPointer(positionLocation, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
+	glVertexAttribPointer(positionLocation, 2, 
+						GL_FLOAT, GL_FALSE, 
+						sizeof(Vertex), 
+						(GLvoid*)offsetof(Vertex, Position));
 
 	//set for color
-	glGenBuffers(1, &colorVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
+	//glGenBuffers(1, &colorVBO);
+	//glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
 
 	GLuint colorLocation = glGetAttribLocation(glProgram->getProgram(), "a_color");
 	glEnableVertexAttribArray(colorLocation);
-	glVertexAttribPointer(colorLocation, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
+	glVertexAttribPointer(colorLocation, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 
+		(GLvoid*)offsetof(Vertex, Color));
 
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-    CC_INCREMENT_GL_DRAWN_BATCHES_AND_VERTICES(1, 3);
+	GLuint indexVbo;
+	glGenBuffers(1, &indexVbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVbo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	//glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (GLvoid*)0);
+
+    CC_INCREMENT_GL_DRAWN_BATCHES_AND_VERTICES(1, 6);
     CHECK_GL_ERROR_DEBUG();
 
 	//

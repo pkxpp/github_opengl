@@ -5,6 +5,11 @@
 
 USING_NS_CC;
 
+typedef struct{
+	float Position[2];
+	float Color[4];
+}Vertex;
+
 class HelloWorld : public cocos2d::Layer
 {
 public:

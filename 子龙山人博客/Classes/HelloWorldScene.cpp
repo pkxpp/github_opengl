@@ -114,6 +114,27 @@ void HelloWorld::onDraw()
     Director::getInstance()->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
     Director::getInstance()->loadIdentityMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
 
+	Mat4 modelViewMatrix;
+    Mat4::createLookAt(Vec3(0,0,1), Vec3(0,0,0), Vec3(0,1,0), &modelViewMatrix);
+    
+    modelViewMatrix.translate(0, 0, -5);
+
+    static float rotation = 0;
+    modelViewMatrix.rotate(Vec3(1,1,1),CC_DEGREES_TO_RADIANS(rotation));
+    rotation++;
+    if (rotation > 360) {
+        rotation = 0;
+    }
+
+    
+    Mat4 projectionMatrix;
+    Mat4::createPerspective(60, 480/320, 1.0, 42, &projectionMatrix);
+    Director::getInstance()->multiplyMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION, projectionMatrix);
+    
+    
+    Director::getInstance()->multiplyMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, modelViewMatrix);
+
+
     //获得当前HelloWorld的shader
     //auto glProgram = getGLProgram;			// 1
 	auto glProgram = mShaderProgram;		// 2
@@ -130,17 +151,65 @@ void HelloWorld::onDraw()
     auto size = Director::getInstance()->getWinSize();
   
 	//新的数据结构
-	Vertex data[] = {
-		{{-1, -1}, {0, 1, 0, 1}},
-		{{1, -1}, {0, 1, 0, 1}},
-		{{-1, 1}, {0, 1, 0, 1}},
-		{{1, 1}, {0, 1, 0, 1}},
-	};
+	Vertex data[] =
+    {
+        // Front
+        { {1, -1, 0}, {1, 0, 0, 1}},
+        { {1, 1, 0}, {0, 1, 0, 1}},
+        { {-1, 1, 0}, {0, 0, 1, 1}},
+        { {-1, -1, 0}, {0, 0, 0, 1}},
+        // Back
+        { {1, 1, -2}, {1, 0, 0, 1}},
+        { {-1, -1, -2}, {0, 1, 0, 1}},
+        { {1, -1, -2}, {0, 0, 1, 1}},
+        { {-1, 1, -2}, {0, 0, 0, 1}},
+        // Left
+        { {-1, -1, 0}, {1, 0, 0, 1}},
+        { {-1, 1, 0}, {0, 1, 0, 1}},
+        { {-1, 1, -2}, {0, 0, 1, 1}},
+        { {-1, -1, -2}, {0, 0, 0, 1}},
+        // Right
+        { {1, -1, -2}, {1, 0, 0, 1}},
+        { {1, 1, -2}, {0, 1, 0, 1}},
+        { {1, 1, 0}, {0, 0, 1, 1}},
+        { {1, -1, 0}, {0, 0, 0, 1}},
+        // Top
+        { {1, 1, 0}, {1, 0, 0, 1}},
+        { {1, 1, -2}, {0, 1, 0, 1}},
+        { {-1, 1, -2}, {0, 0, 1, 1}},
+        { {-1, 1, 0}, {0, 0, 0, 1}},
+        // Bottom
+        { {1, -1, -2}, {1, 0, 0, 1}},
+        { {1, -1, 0}, {0, 1, 0, 1}},
+        { {-1, -1, 0}, {0, 0, 1, 1}},
+        { {-1, -1, -2}, {0, 0, 0, 1}}
+    };
+
+	//GLubyte indices[] = {
+	//	0, 1, 2,			// 第一个三角形索引
+	//	2, 3, 1,			// 第二个三角形索引
+	//};
 
 	GLubyte indices[] = {
-		0, 1, 2,			// 第一个三角形索引
-		2, 3, 1,			// 第二个三角形索引
-	};
+        // Front
+        0, 1, 2,
+        2, 3, 0,
+        // Back
+        4, 5, 6,
+        4, 5, 7,
+        // Left
+        8, 9, 10,
+        10, 11, 8,
+        // Right
+        12, 13, 14,
+        14, 15, 12,
+        // Top
+        16, 17, 18,
+        18, 19, 16,
+        // Bottom
+        20, 21, 22,
+        22, 23, 20
+    };
 
 	//创建和绑定vbo
 	glGenBuffers(1, &vertexVBO);
@@ -152,7 +221,8 @@ void HelloWorld::onDraw()
 	//打开a_position入口点
 	glEnableVertexAttribArray(positionLocation);
 	//传递定点数据个a_position，注意最后一个参数是数组的便宜了
-	glVertexAttribPointer(positionLocation, 2, 
+	glVertexAttribPointer(positionLocation, 
+						3, 
 						GL_FLOAT, GL_FALSE, 
 						sizeof(Vertex), 
 						(GLvoid*)offsetof(Vertex, Position));
@@ -173,9 +243,9 @@ void HelloWorld::onDraw()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	//glDrawArrays(GL_TRIANGLES, 0, 6);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (GLvoid*)0);
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (GLvoid*)0);
 
-    CC_INCREMENT_GL_DRAWN_BATCHES_AND_VERTICES(1, 6);
+    CC_INCREMENT_GL_DRAWN_BATCHES_AND_VERTICES(1, 36);
     CHECK_GL_ERROR_DEBUG();
 
 	//

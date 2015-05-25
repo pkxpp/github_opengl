@@ -6,7 +6,7 @@
 USING_NS_CC;
 
 typedef struct{
-	float Position[2];
+	float Position[3];
 	float Color[4];
 }Vertex;
 

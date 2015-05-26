@@ -6,8 +6,9 @@
 USING_NS_CC;
 
 typedef struct{
-	float Position[3];
+	float Position[2];
 	float Color[4];
+	float TexCoord[2];
 }Vertex;
 
 class HelloWorld : public cocos2d::Layer

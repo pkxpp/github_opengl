@@ -48,6 +48,165 @@ bool HelloWorld::init()
 
     //glGenVertexArrays(1, &vao);
     //glBindVertexArray(vao);
+	//创建和绑定vao
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	auto size = Director::getInstance()->getWinSize();
+
+	//新的数据结构
+	/*Vertex data[] =
+    {
+        // Front
+        { {1, -1, 0}, {1, 0, 0, 1}},
+        { {1, 1, 0}, {0, 1, 0, 1}},
+        { {-1, 1, 0}, {0, 0, 1, 1}},
+        { {-1, -1, 0}, {0, 0, 0, 1}},
+        // Back
+        { {1, 1, -2}, {1, 0, 0, 1}},
+        { {-1, -1, -2}, {0, 1, 0, 1}},
+        { {1, -1, -2}, {0, 0, 1, 1}},
+        { {-1, 1, -2}, {0, 0, 0, 1}},
+        // Left
+        { {-1, -1, 0}, {1, 0, 0, 1}},
+        { {-1, 1, 0}, {0, 1, 0, 1}},
+        { {-1, 1, -2}, {0, 0, 1, 1}},
+        { {-1, -1, -2}, {0, 0, 0, 1}},
+        // Right
+        { {1, -1, -2}, {1, 0, 0, 1}},
+        { {1, 1, -2}, {0, 1, 0, 1}},
+        { {1, 1, 0}, {0, 0, 1, 1}},
+        { {1, -1, 0}, {0, 0, 0, 1}},
+        // Top
+        { {1, 1, 0}, {1, 0, 0, 1}},
+        { {1, 1, -2}, {0, 1, 0, 1}},
+        { {-1, 1, -2}, {0, 0, 1, 1}},
+        { {-1, 1, 0}, {0, 0, 0, 1}},
+        // Bottom
+        { {1, -1, -2}, {1, 0, 0, 1}},
+        { {1, -1, 0}, {0, 1, 0, 1}},
+        { {-1, -1, 0}, {0, 0, 1, 1}},
+        { {-1, -1, -2}, {0, 0, 0, 1}}
+    };*/
+
+	Vertex data[] =
+    {
+        { {-1,-1},{0,1,0,1},{0,1}},
+        { {1,-1},{0,1,0,1},{1,1}},
+        { {-1,1},{0,1,0,1},{0,0}},
+        { {1,1},{0,1,0,1},{1,0}}
+    };
+
+	GLubyte indices[] = {
+		0, 1, 2,			// 第一个三角形索引
+		2, 3, 1,			// 第二个三角形索引
+	};
+
+	/*GLubyte indices[] = {
+        // Front
+        0, 1, 2,
+        2, 3, 0,
+        // Back
+        4, 5, 6,
+        4, 5, 7,
+        // Left
+        8, 9, 10,
+        10, 11, 8,
+        // Right
+        12, 13, 14,
+        14, 15, 12,
+        // Top
+        16, 17, 18,
+        18, 19, 16,
+        // Bottom
+        20, 21, 22,
+        22, 23, 20
+    };*/
+
+	//创建和绑定vbo
+	glGenBuffers(1, &vertexVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+
+	//获取vertex attribute 'a_position'入口点
+	GLuint positionLocation = glGetAttribLocation(mShaderProgram->getProgram(), "a_position");
+	//打开a_position入口点
+	glEnableVertexAttribArray(positionLocation);
+	//传递定点数据个a_position，注意最后一个参数是数组的便宜了
+	glVertexAttribPointer(positionLocation, 
+						2, 
+						GL_FLOAT, GL_FALSE, 
+						sizeof(Vertex), 
+						(GLvoid*)offsetof(Vertex, Position));
+
+	//set for color
+	//glGenBuffers(1, &colorVBO);
+	//glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
+
+	GLuint colorLocation = glGetAttribLocation(mShaderProgram->getProgram(), "a_color");
+	glEnableVertexAttribArray(colorLocation);
+	glVertexAttribPointer(colorLocation, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 
+		(GLvoid*)offsetof(Vertex, Color));
+
+	GLuint textureLocation = glGetAttribLocation(mShaderProgram->getProgram(), "a_coord");
+    glEnableVertexAttribArray(textureLocation);
+    glVertexAttribPointer(textureLocation, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, TexCoord));
+
+	GLuint indexVbo;
+	glGenBuffers(1, &indexVbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVbo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	//method 1: the hard way
+    Image *image = new Image;
+    std::string imagePath = FileUtils::getInstance()->fullPathForFilename("HelloWorld.png");
+    image->initWithImageFile(imagePath);
+    
+//    glPixelStorei(GL_UNPACK_ALIGNMENT, 8);
+
+	GLuint textureId;
+    glGenTextures(1, &textureId);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, textureId);
+//    GL::bindTexture2DN(1,textureId);
+
+
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,  GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+
+    
+    unsigned char *imageData = image->getData();
+    int width = image->getWidth();
+    int height = image->getHeight();
+    glTexImage2D(GL_TEXTURE_2D,
+                 0,
+                 GL_RGB,
+                 width,
+                 height,
+                 0,
+                 GL_RGB,
+                 GL_UNSIGNED_BYTE,//must be GL_UNSIGNED_BYTE
+                 imageData);
+    
+    
+//    //method2: the easier way
+//    Texture2D *texture = new Texture2D;
+//    texture->initWithImage(image);
+//    textureId = texture->getName();
+//    
+//    //method3: the easiest way
+//    Sprite *sprite = Sprite::create("HelloWorld.png");
+//    textureId = sprite->getTexture()->getName();
+    
+    CC_SAFE_DELETE(image);
+
+	//for safty
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     return true;
 }
@@ -144,118 +303,21 @@ void HelloWorld::onDraw()
    //设置该shader的一些内置uniform,主要是MVP，即model-view-project矩阵
     glProgram->setUniformsForBuiltins();
 
-	//创建和绑定vao
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-    auto size = Director::getInstance()->getWinSize();
-  
-	//新的数据结构
-	Vertex data[] =
-    {
-        // Front
-        { {1, -1, 0}, {1, 0, 0, 1}},
-        { {1, 1, 0}, {0, 1, 0, 1}},
-        { {-1, 1, 0}, {0, 0, 1, 1}},
-        { {-1, -1, 0}, {0, 0, 0, 1}},
-        // Back
-        { {1, 1, -2}, {1, 0, 0, 1}},
-        { {-1, -1, -2}, {0, 1, 0, 1}},
-        { {1, -1, -2}, {0, 0, 1, 1}},
-        { {-1, 1, -2}, {0, 0, 0, 1}},
-        // Left
-        { {-1, -1, 0}, {1, 0, 0, 1}},
-        { {-1, 1, 0}, {0, 1, 0, 1}},
-        { {-1, 1, -2}, {0, 0, 1, 1}},
-        { {-1, -1, -2}, {0, 0, 0, 1}},
-        // Right
-        { {1, -1, -2}, {1, 0, 0, 1}},
-        { {1, 1, -2}, {0, 1, 0, 1}},
-        { {1, 1, 0}, {0, 0, 1, 1}},
-        { {1, -1, 0}, {0, 0, 0, 1}},
-        // Top
-        { {1, 1, 0}, {1, 0, 0, 1}},
-        { {1, 1, -2}, {0, 1, 0, 1}},
-        { {-1, 1, -2}, {0, 0, 1, 1}},
-        { {-1, 1, 0}, {0, 0, 0, 1}},
-        // Bottom
-        { {1, -1, -2}, {1, 0, 0, 1}},
-        { {1, -1, 0}, {0, 1, 0, 1}},
-        { {-1, -1, 0}, {0, 0, 1, 1}},
-        { {-1, -1, -2}, {0, 0, 0, 1}}
-    };
-
-	//GLubyte indices[] = {
-	//	0, 1, 2,			// 第一个三角形索引
-	//	2, 3, 1,			// 第二个三角形索引
-	//};
-
-	GLubyte indices[] = {
-        // Front
-        0, 1, 2,
-        2, 3, 0,
-        // Back
-        4, 5, 6,
-        4, 5, 7,
-        // Left
-        8, 9, 10,
-        10, 11, 8,
-        // Right
-        12, 13, 14,
-        14, 15, 12,
-        // Top
-        16, 17, 18,
-        18, 19, 16,
-        // Bottom
-        20, 21, 22,
-        22, 23, 20
-    };
-
-	//创建和绑定vbo
-	glGenBuffers(1, &vertexVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
-
-	//获取vertex attribute 'a_position'入口点
-	GLuint positionLocation = glGetAttribLocation(glProgram->getProgram(), "a_position");
-	//打开a_position入口点
-	glEnableVertexAttribArray(positionLocation);
-	//传递定点数据个a_position，注意最后一个参数是数组的便宜了
-	glVertexAttribPointer(positionLocation, 
-						3, 
-						GL_FLOAT, GL_FALSE, 
-						sizeof(Vertex), 
-						(GLvoid*)offsetof(Vertex, Position));
-
-	//set for color
-	//glGenBuffers(1, &colorVBO);
-	//glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
-
-	GLuint colorLocation = glGetAttribLocation(glProgram->getProgram(), "a_color");
-	glEnableVertexAttribArray(colorLocation);
-	glVertexAttribPointer(colorLocation, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 
-		(GLvoid*)offsetof(Vertex, Color));
-
-	GLuint indexVbo;
-	glGenBuffers(1, &indexVbo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVbo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	//glDrawArrays(GL_TRIANGLES, 0, 6);
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (GLvoid*)0);
-
-    CC_INCREMENT_GL_DRAWN_BATCHES_AND_VERTICES(1, 36);
-    CHECK_GL_ERROR_DEBUG();
-
+    GLuint textureLocation = glGetUniformLocation(glProgram->getProgram(),"CC_Texture0");
+    glUniform1i(textureLocation, 0);
+	
 	//
 	GLuint uColorLocation = glGetUniformLocation(glProgram->getProgram(), "u_color");
 	float uColor[] = {1.0, 1.0, 1.0, 1.0, 1.0};
 	glUniform4fv(uColorLocation, 1, uColor);
 
-	//for safty
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glDrawArrays(GL_TRIANGLES, 0, 6);
+	//glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (GLvoid*)0);
+	 glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE,(GLvoid*)0);
+
+    //CC_INCREMENT_GL_DRAWN_BATCHES_AND_VERTICES(1, 36);
+	CC_INCREMENT_GL_DRAWN_BATCHES_AND_VERTICES(1, 6);
+    CHECK_GL_ERROR_DEBUG();
 
 	Director::getInstance()->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
     Director::getInstance()->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);

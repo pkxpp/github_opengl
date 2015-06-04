@@ -1,0 +1,19 @@
+1. 2015/06/02 运行报错
+
+setlocal
+"D:\\Program Files (x86)\\CMake\\bin\\cmake.exe" -E copy F:/我的文件/快盘/Study/opengl/build/$(Configuration)/playground.exe F:/我的文件/快盘/Study/opengl/OpenGL-tutorial_v0014_33/playground/
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+
+
+* 提示文件创建不成功
+, 
+解决办法：把build/cmake_install.cmake 的CMAKE_INSTALL_PREFIX路径修改一下就可以了，如下
+
+  # set(CMAKE_INSTALL_PREFIX "C:/Program Files/Tutorials")
+  set(CMAKE_INSTALL_PREFIX "f:/我的文件/快盘/Study/opengl/build/Tutorials")

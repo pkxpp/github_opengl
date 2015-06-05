@@ -57,6 +57,11 @@ int main( void )
 	// Create and compile our GLSL program from the shaders
 	GLuint programID = LoadShaders( "SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader" );
 
+	//
+	glm::mat4 myMatrix;
+	glm::vec4 myVector;
+	glm::vec4 transformedVector = myMatrix * myVector;
+
 	//An array of 3 vectors which represents 3 vertices
 	static const GLfloat g_vertex_buffer_data[] = {
 		-1.0f, -1.0f, 0.0f, 

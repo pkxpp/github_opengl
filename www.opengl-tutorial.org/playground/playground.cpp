@@ -13,6 +13,7 @@ GLFWwindow* window;
 using namespace glm;
 
 #include <common/shader.hpp>
+#include <common/texture.hpp>
 
 int main( void )
 {
@@ -111,6 +112,46 @@ int main( void )
 		1.0f,-1.0f, 1.0f
 	};
 
+	// Two UV coordinatesfor each vertex. They were created with Blender. You'll learn shortly how to do this yourself.
+static const GLfloat g_uv_buffer_data[] = {
+    0.000059f, 1.0f-0.000004f,
+    0.000103f, 1.0f-0.336048f,
+    0.335973f, 1.0f-0.335903f,
+    1.000023f, 1.0f-0.000013f,
+    0.667979f, 1.0f-0.335851f,
+    0.999958f, 1.0f-0.336064f,
+    0.667979f, 1.0f-0.335851f,
+    0.336024f, 1.0f-0.671877f,
+    0.667969f, 1.0f-0.671889f,
+    1.000023f, 1.0f-0.000013f,
+    0.668104f, 1.0f-0.000013f,
+    0.667979f, 1.0f-0.335851f,
+    0.000059f, 1.0f-0.000004f,
+    0.335973f, 1.0f-0.335903f,
+    0.336098f, 1.0f-0.000071f,
+    0.667979f, 1.0f-0.335851f,
+    0.335973f, 1.0f-0.335903f,
+    0.336024f, 1.0f-0.671877f,
+    1.000004f, 1.0f-0.671847f,
+    0.999958f, 1.0f-0.336064f,
+    0.667979f, 1.0f-0.335851f,
+    0.668104f, 1.0f-0.000013f,
+    0.335973f, 1.0f-0.335903f,
+    0.667979f, 1.0f-0.335851f,
+    0.335973f, 1.0f-0.335903f,
+    0.668104f, 1.0f-0.000013f,
+    0.336098f, 1.0f-0.000071f,
+    0.000103f, 1.0f-0.336048f,
+    0.000004f, 1.0f-0.671870f,
+    0.336024f, 1.0f-0.671877f,
+    0.000103f, 1.0f-0.336048f,
+    0.336024f, 1.0f-0.671877f,
+    0.335973f, 1.0f-0.335903f,
+    0.667969f, 1.0f-0.671889f,
+    1.000004f, 1.0f-0.671847f,
+    0.667979f, 1.0f-0.335851f
+};
+
 	//This will identify our vertex buffer
 	GLuint vertexbuffer;
 	// Generate 1 buffer, put the resulting identifier in vertexbuffer
@@ -137,6 +178,13 @@ int main( void )
 	//Get a handle for our "MVP" uniform
 	// Only at initialation time
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+
+	// Load the texture using any two methods
+	//GLuint Texture = loadBMP_custom("uvtemplate.bmp");
+	GLuint Texture = loadDDS("uvtemplate.DDS");
+	
+	// Get a handle for our "myTextureSampler" uniform
+	GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
 
 	// One color for each vertex. They were generated randomly.
 	/*static const GLfloat g_color_buffer_data[] = {
@@ -186,11 +234,15 @@ int main( void )
 	}
 
 	// 2nd attribute buffer: colors
-	GLuint colorbuffer;
-	glGenBuffers(1, &colorbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+	//GLuint colorbuffer;
+	//glGenBuffers(1, &colorbuffer);
+	//glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
 
+	GLuint uvbuffer;
+	glGenBuffers(1, &uvbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_STATIC_DRAW);
 
 	do{
 		//Clear the screen
@@ -204,6 +256,13 @@ int main( void )
 		// in the "MVP" uniform
 		// for each model you render, since the MVP will be diffrent(at the least MVP matrix)
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+
+		// Bind our texture in Texture Unit 0
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, Texture);
+		// Set our "myTextureSampler" sampler to user Texture Unit 0
+		glUniform1i(TextureID, 0);
+
 
 		//Draw nothing, see you in tutorial 2!
 		glEnableVertexAttribArray(0);
@@ -220,10 +279,10 @@ int main( void )
 		// 2nd
 		// T4 - Exercises 3: 如果glBufferData放在这里，显示将是很多凌乱的三角形
 		//glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+		//glEnableVertexAttribArray(1);
+		//glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 		// T4 - Exercises 3: 每帧变化
-		for (int v = 0; v < 12*3 ; v++){
+		/*for (int v = 0; v < 12*3 ; v++){
 			g_color_buffer_data[3*v+0] = 1.0 * rand()/RAND_MAX;
 			g_color_buffer_data[3*v+1] = 1.0 * rand()/RAND_MAX;
 			g_color_buffer_data[3*v+2] = 1.0 * rand()/RAND_MAX;
@@ -236,11 +295,23 @@ int main( void )
 				GL_FALSE,
 				0, 
 				(void*)0
+		);*/
+
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+		glVertexAttribPointer(
+				1,
+				2,
+				GL_FLOAT,
+				GL_FALSE,
+				0, 
+				(void*)0
 		);
 
 		//Draw the triangle!
 		glDrawArrays(GL_TRIANGLES, 0, 12 * 3);	//Starting from vertex 0; 
 		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
 
 		//Swap buffers
 		glfwSwapBuffers(window);
@@ -251,6 +322,8 @@ int main( void )
 
 	// Cleanup VBO
 	glDeleteBuffers(1, &vertexbuffer);
+	glDeleteBuffers(1, &uvbuffer);
+	glDeleteTextures(1, &TextureID);
 	glDeleteVertexArrays(1, &VertexArrayID);
 	glDeleteProgram(programID);
 

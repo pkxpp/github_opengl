@@ -14,6 +14,7 @@ using namespace glm;
 
 #include <common/shader.hpp>
 #include <common/texture.hpp>
+#include <common/controls.hpp>
 
 int main( void )
 {
@@ -32,7 +33,7 @@ int main( void )
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	//open a window and create its OpenGL context
-	GLFWwindow *window;
+	//GLFWwindow *window;
 	window = glfwCreateWindow( 1024, 768, "Tutorial 02", NULL, NULL);
 	if (window == NULL)
 	{
@@ -251,6 +252,13 @@ static const GLfloat g_uv_buffer_data[] = {
 
 		//use our shader
 		glUseProgram(programID);
+
+		// Compute the MVP matrix from keyboard and mouse input
+		computeMatricesFromInputs();
+		glm::mat4 ProjectionMatrix = getProjectionMatrix();
+		glm::mat4 ViewMatrix = getViewMatrix();
+		glm::mat4 ModelMatrix = glm::mat4(1.0);
+		glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
 		// Send Our transformation to the currently bound shader
 		// in the "MVP" uniform

@@ -1,0 +1,10 @@
+1. 环境搭建
+* 把红宝书里面的第一个例子打进来，编译报错
+* 按照网上的方法把limcmtd忽略掉，编译通过
+* 神奇的问题出现了：glutCreateWindow函数直接退出！！！
+* 参考[1]下了一个工具GPU viewer，发现版本是4.2，所以修改代码：glutInitContextVersion(4, 3);-->glutInitContextVersion(4, 2);竟然继续往下执行了
+* 接着报错glGenVertexArrays地方报错了，解决办法：glewInit之前加上语句：glewExperimental = GL_TRUE;参考[2]
+
+参考：
+[1]http://johnhany.net/2014/01/environment-for-opengl-with-vs2010/#imageclose-448
+[2]http://www.4byte.cn/question/252116/why-does-this-crash-when-using-opengl-core-profile.html

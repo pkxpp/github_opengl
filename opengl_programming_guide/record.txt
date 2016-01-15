@@ -8,3 +8,11 @@
 参考：
 [1]http://johnhany.net/2014/01/environment-for-opengl-with-vs2010/#imageclose-448
 [2]http://www.4byte.cn/question/252116/why-does-this-crash-when-using-opengl-core-profile.html
+
+2. 2015/01/15
+(1) 终于知道为毛每个工程没有main函数了, 因为他定义了好多宏在vapp.h中，可以学习一下别人的写法
+
+(2) 报错
+* Error	3	error C3861: 'translation': identifier not found	f:\我的文件\快盘\study\opengl\opengl编程指南\oglpg-8th-edition\03\ch03_drawcommands\ch03_drawcommands.cpp	136	1	ch03_drawcommands
+* 去vmath.h中的确美柚看到translation函数，但是有translate函数，换一下
+*  static const ShaderInfo shader_info[] 报错，换成--> static ShaderInfo shader_info[] =

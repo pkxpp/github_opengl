@@ -9,10 +9,15 @@
 [1]http://johnhany.net/2014/01/environment-for-opengl-with-vs2010/#imageclose-448
 [2]http://www.4byte.cn/question/252116/why-does-this-crash-when-using-opengl-core-profile.html
 
-2. 2015/01/15
+2. 2016/01/15
 (1) 终于知道为毛每个工程没有main函数了, 因为他定义了好多宏在vapp.h中，可以学习一下别人的写法
 
 (2) 报错
 * Error	3	error C3861: 'translation': identifier not found	f:\我的文件\快盘\study\opengl\opengl编程指南\oglpg-8th-edition\03\ch03_drawcommands\ch03_drawcommands.cpp	136	1	ch03_drawcommands
 * 去vmath.h中的确美柚看到translation函数，但是有translate函数，换一下
 *  static const ShaderInfo shader_info[] 报错，换成--> static ShaderInfo shader_info[] =
+
+3. 2016/01/17 
+(1)一直显示一个三角形，书上说的有四个三角形，结果发现是shader脚本路径填错了 = =
+* 但是更加悲剧了，什么都没显示了,而且报错：GL_INVALID_OPERATION error generated. Uniform is not an array, but count is greater than 1.
+* 看了一遍这个问题，怀疑和glUniformMatrix4fv有关，把源代码的4改成了1就大功告成了，现在还只能是知其然不知其所以然

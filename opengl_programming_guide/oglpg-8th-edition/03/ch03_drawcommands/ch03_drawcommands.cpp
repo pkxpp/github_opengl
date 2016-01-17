@@ -45,8 +45,8 @@ void DrawCommandExample::Initialize(const char * title)
 
     static ShaderInfo shader_info[] =
     {
-        { GL_VERTEX_SHADER, "../03/ch03_primitive_restart/primitive_restart.vs.glsl" },
-        { GL_FRAGMENT_SHADER, "../03/ch03_primitive_restart/primitive_restart.fs.glsl" },
+        { GL_VERTEX_SHADER, "../ch03_primitive_restart/primitive_restart.vs.glsl" },
+        { GL_FRAGMENT_SHADER, "../ch03_primitive_restart/primitive_restart.fs.glsl" },
         { GL_NONE, NULL }
     };
 
@@ -134,22 +134,22 @@ void DrawCommandExample::Display(bool auto_redraw)
 
     // Draw Arrays...
     model_matrix = vmath::translate(-3.0f, 0.0f, -5.0f);
-    glUniformMatrix4fv(render_model_matrix_loc, 4, GL_FALSE, model_matrix);
+    glUniformMatrix4fv(render_model_matrix_loc, 1, GL_FALSE, model_matrix);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
     // DrawElements
     model_matrix = vmath::translate(-1.0f, 0.0f, -5.0f);
-    glUniformMatrix4fv(render_model_matrix_loc, 4, GL_FALSE, model_matrix);
+    glUniformMatrix4fv(render_model_matrix_loc, 1, GL_FALSE, model_matrix);
     glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, NULL);
 
     // DrawElementsBaseVertex
     model_matrix = vmath::translate(1.0f, 0.0f, -5.0f);
-    glUniformMatrix4fv(render_model_matrix_loc, 4, GL_FALSE, model_matrix);
+    glUniformMatrix4fv(render_model_matrix_loc, 1, GL_FALSE, model_matrix);
     glDrawElementsBaseVertex(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, NULL, 1);
 
     // DrawArraysInstanced
     model_matrix = vmath::translate(3.0f, 0.0f, -5.0f);
-    glUniformMatrix4fv(render_model_matrix_loc, 4, GL_FALSE, model_matrix);
+    glUniformMatrix4fv(render_model_matrix_loc, 1, GL_FALSE, model_matrix);
     glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 1);
 
     base::Display();

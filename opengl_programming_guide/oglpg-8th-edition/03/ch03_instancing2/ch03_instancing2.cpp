@@ -122,7 +122,7 @@ void InstancingExample::Initialize(const char * title)
     projection_matrix_loc = glGetUniformLocation(render_prog, "projection_matrix");
 
     // Load the object
-    object.LoadFromVBM("C:/Vermilion-Book/trunk/Code/media/armadillo_low.vbm", 0, 1, 2);
+    object.LoadFromVBM("../../media/armadillo_low.vbm", 0, 1, 2);
 
     // Bind its vertex array object so that we can append the instanced attributes
     object.BindVertexArray();
